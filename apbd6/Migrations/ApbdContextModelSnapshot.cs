@@ -25,10 +25,7 @@ namespace apbd6.Migrations
             modelBuilder.Entity("apbd6.Models.Doctor", b =>
                 {
                     b.Property<int>("IdDoctor")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdDoctor"));
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -81,10 +78,7 @@ namespace apbd6.Migrations
             modelBuilder.Entity("apbd6.Models.Patient", b =>
                 {
                     b.Property<int>("IdPatient")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdPatient"));
 
                     b.Property<DateTime>("Birthdate")
                         .HasColumnType("datetime2");
@@ -124,22 +118,20 @@ namespace apbd6.Migrations
                     b.Property<int>("IdPatient")
                         .HasColumnType("int");
 
-                    b.Property<int?>("PrescriptionIdPrescription")
-                        .HasColumnType("int");
-
                     b.HasKey("IdPrescription");
 
                     b.HasIndex("IdDoctor");
 
                     b.HasIndex("IdPatient");
 
-                    b.HasIndex("PrescriptionIdPrescription");
-
                     b.ToTable("Prescriptions");
                 });
 
             modelBuilder.Entity("apbd6.Models.Prescription_Medicament", b =>
                 {
+                    b.Property<int>("IdMedicament")
+                        .HasColumnType("int");
+
                     b.Property<int>("IdPrescription")
                         .HasColumnType("int");
 
@@ -148,18 +140,15 @@ namespace apbd6.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<int>("Dose")
-                        .HasColumnType("int");
-
-                    b.Property<int>("IdMedicament")
+                    b.Property<int?>("Dose")
                         .HasColumnType("int");
 
                     b.Property<int?>("PatientIdPatient")
                         .HasColumnType("int");
 
-                    b.HasKey("IdPrescription");
+                    b.HasKey("IdMedicament", "IdPrescription");
 
-                    b.HasIndex("IdMedicament");
+                    b.HasIndex("IdPrescription");
 
                     b.HasIndex("PatientIdPatient");
 
@@ -180,10 +169,6 @@ namespace apbd6.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("apbd6.Models.Prescription", null)
-                        .WithMany("Prescriptions")
-                        .HasForeignKey("PrescriptionIdPrescription");
-
                     b.Navigation("Doctor");
 
                     b.Navigation("Patient");
@@ -198,7 +183,7 @@ namespace apbd6.Migrations
                         .IsRequired();
 
                     b.HasOne("apbd6.Models.Prescription", "Prescription")
-                        .WithMany()
+                        .WithMany("PrescriptionMedicaments")
                         .HasForeignKey("IdPrescription")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -229,7 +214,7 @@ namespace apbd6.Migrations
 
             modelBuilder.Entity("apbd6.Models.Prescription", b =>
                 {
-                    b.Navigation("Prescriptions");
+                    b.Navigation("PrescriptionMedicaments");
                 });
 #pragma warning restore 612, 618
         }

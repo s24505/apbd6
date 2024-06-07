@@ -6,11 +6,25 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace apbd6.Migrations
 {
     /// <inheritdoc />
-    public partial class AddedFewTables : Migration
+    public partial class AddedNewTables : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "Doctors",
+                columns: table => new
+                {
+                    IdDoctor = table.Column<int>(type: "int", nullable: false),
+                    FirstName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    LastName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Doctors", x => x.IdDoctor);
+                });
+
             migrationBuilder.CreateTable(
                 name: "Medicaments",
                 columns: table => new
@@ -30,8 +44,7 @@ namespace apbd6.Migrations
                 name: "Patients",
                 columns: table => new
                 {
-                    IdPatient = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    IdPatient = table.Column<int>(type: "int", nullable: false),
                     FirstName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     LastName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Birthdate = table.Column<DateTime>(type: "datetime2", nullable: false)
@@ -50,8 +63,7 @@ namespace apbd6.Migrations
                     Date = table.Column<DateTime>(type: "datetime2", nullable: false),
                     DueDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IdPatient = table.Column<int>(type: "int", nullable: false),
-                    IdDoctor = table.Column<int>(type: "int", nullable: false),
-                    PrescriptionIdPrescription = table.Column<int>(type: "int", nullable: true)
+                    IdDoctor = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -68,26 +80,21 @@ namespace apbd6.Migrations
                         principalTable: "Patients",
                         principalColumn: "IdPatient",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Prescriptions_Prescriptions_PrescriptionIdPrescription",
-                        column: x => x.PrescriptionIdPrescription,
-                        principalTable: "Prescriptions",
-                        principalColumn: "IdPrescription");
                 });
 
             migrationBuilder.CreateTable(
                 name: "PrescriptionMedicaments",
                 columns: table => new
                 {
-                    IdPrescription = table.Column<int>(type: "int", nullable: false),
                     IdMedicament = table.Column<int>(type: "int", nullable: false),
-                    Dose = table.Column<int>(type: "int", nullable: false),
+                    IdPrescription = table.Column<int>(type: "int", nullable: false),
+                    Dose = table.Column<int>(type: "int", nullable: true),
                     Details = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     PatientIdPatient = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_PrescriptionMedicaments", x => x.IdPrescription);
+                    table.PrimaryKey("PK_PrescriptionMedicaments", x => new { x.IdMedicament, x.IdPrescription });
                     table.ForeignKey(
                         name: "FK_PrescriptionMedicaments_Medicaments_IdMedicament",
                         column: x => x.IdMedicament,
@@ -108,9 +115,9 @@ namespace apbd6.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_PrescriptionMedicaments_IdMedicament",
+                name: "IX_PrescriptionMedicaments_IdPrescription",
                 table: "PrescriptionMedicaments",
-                column: "IdMedicament");
+                column: "IdPrescription");
 
             migrationBuilder.CreateIndex(
                 name: "IX_PrescriptionMedicaments_PatientIdPatient",
@@ -126,11 +133,6 @@ namespace apbd6.Migrations
                 name: "IX_Prescriptions_IdPatient",
                 table: "Prescriptions",
                 column: "IdPatient");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Prescriptions_PrescriptionIdPrescription",
-                table: "Prescriptions",
-                column: "PrescriptionIdPrescription");
         }
 
         /// <inheritdoc />
@@ -144,6 +146,9 @@ namespace apbd6.Migrations
 
             migrationBuilder.DropTable(
                 name: "Prescriptions");
+
+            migrationBuilder.DropTable(
+                name: "Doctors");
 
             migrationBuilder.DropTable(
                 name: "Patients");
